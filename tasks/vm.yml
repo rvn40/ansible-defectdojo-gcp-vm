@@ -1,0 +1,54 @@
+---
+- name: Get info on a network
+  gcp_compute_network_info:
+    filters:
+    - name = "{{ vpc.name }}"
+    project: "{{ project[1].projectID }}"
+    auth_kind: "{{ project[1].authkind }}"
+    service_account_file: "{{ serviceaccounts[0].json_directory }}{{ serviceaccounts[0].json_name }}"
+  register: network
+
+- name: Get info on a subnetwork
+  gcp_compute_subnetwork_info:
+    region: "{{ general.region_default }}"
+    filters:
+    - name = "{{ subnets[0].name }}"
+    project: "{{ project[1].projectID }}"
+    auth_kind: "{{ project[1].authkind }}"
+    service_account_file: "{{ serviceaccounts[0].json_directory }}{{ serviceaccounts[0].json_name }}"
+  register: subnetwork
+
+#- name: Print all available facts
+#  ansible.builtin.debug:
+#    msg: "{{ subnetwork}}"
+
+- name: Create defectdojo machines 
+  gcp_compute_instance:
+    name: "{{ general.prefix_first }}-{{ general.prefix_second }}-{{ vms_item[0].cluster_name }}-{{vms_item[1].role}}-{{vms_item[1].index}}-{{subnets[0].group}}"
+    machine_type: "{{vms_item[1].type}}"
+    disks:
+    - auto_delete: true
+      boot: yes
+      initialize_params:
+        disk_name: "{{vms_item[0].cluster_name}}-{{vms_item[1].role}}-{{vms_item[1].index}}-disk-01"
+        disk_size_gb: "{{vms_item[1].disk1_size}}"
+        disk_type: "pd-standard"
+        source_image: "{{vms_item[1].images}}"
+    metadata:
+      enable-oslogin: TRUE
+    network_interfaces:
+    - network: "{{ network.resources[0] }}"
+      subnetwork: "{{ subnetwork.resources[0] }}"
+    zone: "{{ general.region_default }}-{{ vms_item[1].zone }}"
+    tags:
+      items: ["webport-public-rules","ssh-public-rules"]
+    project: "{{ project[0].projectID }}"
+    auth_kind: "{{ project[0].authkind }}"
+    service_account_file: "{{ serviceaccounts[0].json_directory }}{{ serviceaccounts[0].json_name }}"
+    state: "{{ vms_item[1].state }}"
+  with_subelements:
+    - "{{vms}}"
+    - properties
+  loop_control:
+    loop_var: vms_item
+  register: cluster_members

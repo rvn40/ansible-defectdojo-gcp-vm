@@ -1,0 +1,20 @@
+---
+
+- name: upgrade all packages, excluding kernel & foo related packages
+  yum:
+    name: '*'
+    state: latest
+    exclude: kernel*
+
+- name: Install basic packages
+  yum:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - "@Development tools"
+    - curl
+    - git
+    - jq
+    - vim-enhanced
+    - nano
+    - yum-utils

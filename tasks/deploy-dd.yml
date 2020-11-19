@@ -1,0 +1,27 @@
+---
+
+- name: Configure access token bitbucket
+  shell: curl -s -X POST -u "{{bitbucket.client_id}}:{{bitbucket.client_secret}}" \
+                https://bitbucket.org/site/oauth2/access_token \
+                -d grant_type=client_credentials -d scopes="repository"| jq --raw-output '.access_token'
+  register: access_token
+
+- name: Downloading dd repository
+  git:
+    repo: "https://x-token-auth:{{access_token.stdout}}@bitbucket.org/tunaiku/devsecops-defectdojo.git"
+    dest: /home/{{users.ssh[0].username}}/devsecops-defectdojo
+    version: master
+  register: cloned
+
+- debug:
+    var: cloned
+
+- name: Example copying script file
+  template:
+    src: files/bash/dd-install.sh.j2
+    dest: /home/{{users.ssh[0].username}}/devsecops-defectdojo/sre/dd-install.sh
+
+- name: Execute sh script
+  shell: bash sre/dd-install.sh
+  args:
+    chdir: /home/{{users.ssh[0].username}}/devsecops-defectdojo/

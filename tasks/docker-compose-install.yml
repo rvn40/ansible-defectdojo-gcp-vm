@@ -1,0 +1,42 @@
+---
+
+- name: Add docker-ce repository
+  shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+- name: upgrade all packages, excluding kernel & foo related packages
+  yum:
+    name: '*'
+    state: latest
+    exclude: kernel*
+
+- name: Install docker-ce packages
+  yum:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - docker-ce
+
+- name: Find out os type and arch
+  shell: "{{item}}"
+  register: os_type
+  with_items:
+    - "uname -s"
+    - "uname -m"
+
+- name: Download docker-compose
+  get_url:
+    url: "https://github.com/docker/compose/releases/download/1.25.4/docker-compose-{{os_type.results[0].stdout}}-{{os_type.results[1].stdout}}"
+    dest: /usr/bin/docker-compose
+    mode: '0755'
+
+- name: Test docker compose
+  shell: docker-compose --version
+
+- name: Start docker services
+  shell: systemctl start docker
+
+- name: Install docker packages python modules
+  pip:
+    name: docker==4.3.1
+    executable: pip3.6
+#    extra_args: --user

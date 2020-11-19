@@ -1,0 +1,52 @@
+---
+
+general:
+  prefix_first: "ab"
+  prefix_second: "sre"
+  region_default: "asia-southeast2"
+  wild_world_range: "0.0.0.0/0"
+project:
+  - projectID: "amarbank-sre" 
+    authkind: "serviceaccount"   
+  - projectID: "amarbank-shared-platform" 
+    authkind: "serviceaccount"
+serviceaccounts: 
+  - name: "amarbank-sre-owner"
+    email: "amarbank-sre-owner@amarbank-sre.iam.gserviceaccount.com"
+    json_directory: "files/serviceaccounts/"
+    json_name: "amarbank-sre-owner.json"
+users:
+  ssh:
+    - username: "rivan_pratama_amarbank_co_id"
+      key_directory: "files/ssh_keys/"
+      key_filename: "rivan_amar.pem"
+bitbucket:
+  client_id: f7wppGJvPu2vxjryax
+  client_secret: c3FXfywzGg6DWGumE9wYheaGyfVa5xn8
+vpc:
+  name: "amarbank-global"
+subnets:
+  - name: "ab-sre-sea2-snet-01"
+    group: "sea2"
+    subnet_range: 10.247.84.0/26
+firewall:
+  - name: "ab-global-internet-webport-allow-rule"
+    protocol: tcp
+    port:   ["80","443","8080"]
+    source_ranges: "0.0.0.0/0"
+    target_tags: "webport-public-rules"
+  - name: "ab-global-internet-ssh-allow-rule"
+    protocol: tcp
+    port:   ["22"]
+    source_ranges: "0.0.0.0/0"
+    target_tags: "ssh-public-rules"
+vms:
+  - cluster_name: "defectdojo"
+    properties:
+      - role: "server"
+        index: "01"
+        zone: "b"
+        type: "e2-standard-2"
+        state: "present"
+        disk1_size: "20"
+        images: https://www.googleapis.com/compute/v1/projects/centos-cloud/global/images/centos-8-v20201014
