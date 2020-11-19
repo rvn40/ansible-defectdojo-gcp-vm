@@ -6,36 +6,37 @@ general:
   region_default: "asia-southeast2"
   wild_world_range: "0.0.0.0/0"
 project:
-  - projectID: "amarbank-sre" 
+  - projectID: "" 
     authkind: "serviceaccount"   
-  - projectID: "amarbank-shared-platform" 
+  - projectID: "" 
     authkind: "serviceaccount"
 serviceaccounts: 
-  - name: "amarbank-sre-owner"
-    email: "amarbank-sre-owner@amarbank-sre.iam.gserviceaccount.com"
+  - name: ""
+    email: ""
     json_directory: "files/serviceaccounts/"
-    json_name: "amarbank-sre-owner.json"
+    json_name: "example.json"
 users:
   ssh:
-    - username: "rivan_pratama_amarbank_co_id"
+    - username: ""
       key_directory: "files/ssh_keys/"
-      key_filename: "rivan_amar.pem"
+      key_filename: "example.pem"
+# If using bitbucket
 bitbucket:
-  client_id: f7wppGJvPu2vxjryax
-  client_secret: c3FXfywzGg6DWGumE9wYheaGyfVa5xn8
+  client_id: 
+  client_secret: 
 vpc:
-  name: "amarbank-global"
+  name: ""
 subnets:
   - name: "ab-sre-sea2-snet-01"
     group: "sea2"
-    subnet_range: 10.247.84.0/26
+    subnet_range: 
 firewall:
-  - name: "ab-global-internet-webport-allow-rule"
+  - name: "ab-global-internet-webport-allow-rule" # Feel free to change it name with your own
     protocol: tcp
     port:   ["80","443","8080"]
     source_ranges: "0.0.0.0/0"
     target_tags: "webport-public-rules"
-  - name: "ab-global-internet-ssh-allow-rule"
+  - name: "ab-global-internet-ssh-allow-rule" # Feel free to change it name with your own
     protocol: tcp
     port:   ["22"]
     source_ranges: "0.0.0.0/0"
@@ -49,4 +50,4 @@ vms:
         type: "e2-standard-2"
         state: "present"
         disk1_size: "20"
-        images: https://www.googleapis.com/compute/v1/projects/centos-cloud/global/images/centos-8-v20201014
+        images: "url_images"
